@@ -1,5 +1,11 @@
 import React from "react";
 import { Composition } from "remotion";
+import { loadFont } from "@remotion/google-fonts/JetBrainsMono";
+
+export const { fontFamily: monoFont } = loadFont("normal", {
+  weights: ["400", "700"],
+  subsets: ["latin"],
+});
 
 const Placeholder: React.FC = () => {
   return <div style={{ backgroundColor: "#1e1e2e", width: "100%", height: "100%" }} />;
