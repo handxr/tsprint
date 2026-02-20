@@ -9,7 +9,15 @@ export type GameState = {
   isRunning: boolean;
   isFinished: boolean;
   wordResults: Array<"correct" | "incorrect" | "pending">;
+};
+
+export type GameHook = GameState & {
   charInputs: string[][];
+  startGame: () => void;
+  handleChar: (char: string) => void;
+  handleBackspace: () => void;
+  handleSpace: () => void;
+  getResults: () => GameResults;
 };
 
 export type GameResults = {
@@ -28,7 +36,10 @@ function generateWords(count: number): string[] {
 
 export function useGame(duration: number) {
   const wordCount = Math.max(duration * 3, 50);
-  const [state, setState] = useState<GameState>({
+  const charInputsRef = useRef<string[][]>(
+    Array.from({ length: wordCount }, () => [])
+  );
+  const [state, setState] = useState<GameState>(() => ({
     words: generateWords(wordCount),
     currentWordIndex: 0,
     currentInput: "",
@@ -36,8 +47,7 @@ export function useGame(duration: number) {
     isRunning: false,
     isFinished: false,
     wordResults: Array(wordCount).fill("pending"),
-    charInputs: Array(wordCount).fill(null).map(() => []),
-  });
+  }));
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
@@ -68,29 +78,18 @@ export function useGame(duration: number) {
   const handleChar = useCallback((char: string) => {
     setState((prev) => {
       if (prev.isFinished) return prev;
+      charInputsRef.current[prev.currentWordIndex].push(char);
       if (!prev.isRunning) {
         startTimeRef.current = Date.now();
-        const newCharInputs = [...prev.charInputs];
-        newCharInputs[prev.currentWordIndex] = [
-          ...newCharInputs[prev.currentWordIndex],
-          char,
-        ];
         return {
           ...prev,
           isRunning: true,
           currentInput: prev.currentInput + char,
-          charInputs: newCharInputs,
         };
       }
-      const newCharInputs = [...prev.charInputs];
-      newCharInputs[prev.currentWordIndex] = [
-        ...newCharInputs[prev.currentWordIndex],
-        char,
-      ];
       return {
         ...prev,
         currentInput: prev.currentInput + char,
-        charInputs: newCharInputs,
       };
     });
   }, []);
@@ -99,11 +98,10 @@ export function useGame(duration: number) {
     setState((prev) => {
       if (prev.isFinished) return prev;
 
-      // If current input is empty, go back to previous word
       if (prev.currentInput.length === 0) {
         if (prev.currentWordIndex === 0) return prev;
         const prevIndex = prev.currentWordIndex - 1;
-        const prevInput = prev.charInputs[prevIndex].join("");
+        const prevInput = charInputsRef.current[prevIndex].join("");
         const newWordResults = [...prev.wordResults];
         newWordResults[prevIndex] = "pending";
         return {
@@ -114,15 +112,10 @@ export function useGame(duration: number) {
         };
       }
 
-      // Otherwise delete last char of current word
-      const newCharInputs = [...prev.charInputs];
-      newCharInputs[prev.currentWordIndex] = newCharInputs[
-        prev.currentWordIndex
-      ].slice(0, -1);
+      charInputsRef.current[prev.currentWordIndex].pop();
       return {
         ...prev,
         currentInput: prev.currentInput.slice(0, -1),
-        charInputs: newCharInputs,
       };
     });
   }, []);
@@ -151,7 +144,7 @@ export function useGame(duration: number) {
 
     for (let i = 0; i < state.currentWordIndex; i++) {
       const word = state.words[i];
-      const input = state.charInputs[i].join("");
+      const input = charInputsRef.current[i].join("");
       totalChars += Math.max(word.length, input.length) + 1;
       if (input === word) {
         correctChars += word.length + 1;
@@ -167,10 +160,11 @@ export function useGame(duration: number) {
     const accuracy = totalChars > 0 ? Math.round((correctChars / totalChars) * 1000) / 10 : 0;
 
     return { wpm, accuracy, time: duration };
-  }, [state.currentWordIndex, state.charInputs, state.words, duration]);
+  }, [state.currentWordIndex, state.words, duration]);
 
   return {
     ...state,
+    charInputs: charInputsRef.current,
     startGame,
     handleChar,
     handleBackspace,
