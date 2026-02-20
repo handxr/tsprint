@@ -79,7 +79,7 @@ export function useGame(duration: number) {
           }
           return { ...prev, timeLeft: newTimeLeft };
         });
-      }, 200);
+      }, 1000);
     }
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
