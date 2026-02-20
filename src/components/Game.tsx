@@ -29,7 +29,7 @@ export function Game({ duration, onFinish, onExit, onRestart }: GameProps) {
     }
     if (game.isFinished) return;
 
-    if (key.backspace) {
+    if (key.backspace || key.delete) {
       game.handleBackspace();
     } else if (input === " ") {
       game.handleSpace();
