@@ -1,9 +1,32 @@
 {
   "name": "tsprint",
-  "module": "index.ts",
+  "version": "1.0.0",
+  "description": "A minimal, fast typing test for the terminal",
   "type": "module",
   "bin": {
     "tsprint": "src/index.tsx"
+  },
+  "keywords": [
+    "typing",
+    "typing-test",
+    "wpm",
+    "terminal",
+    "cli",
+    "speed-typing"
+  ],
+  "author": "handxr",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/handxr/tsprint"
+  },
+  "homepage": "https://github.com/handxr/tsprint",
+  "bugs": {
+    "url": "https://github.com/handxr/tsprint/issues"
+  },
+  "dependencies": {
+    "ink": "^6.8.0",
+    "react": "^19.2.4"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -11,9 +34,5 @@
   },
   "peerDependencies": {
     "typescript": "^5.9.3"
-  },
-  "dependencies": {
-    "ink": "^6.8.0",
-    "react": "^19.2.4"
   }
 }
