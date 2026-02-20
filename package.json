@@ -2,7 +2,6 @@
   "name": "typesprint",
   "module": "index.ts",
   "type": "module",
-  "private": true,
   "bin": {
     "typesprint": "src/index.tsx"
   },

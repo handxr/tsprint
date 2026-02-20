@@ -75,11 +75,26 @@ export function Game({ duration, onFinish, onExit, onRestart }: GameProps) {
           const wordResult = game.wordResults[wordIndex];
 
           if (isPast) {
+            const inputChars = game.charInputs[wordIndex];
             return (
               <Box key={wordIndex} marginRight={1}>
-                <Text color={wordResult === "correct" ? "green" : "red"}>
-                  {word}
-                </Text>
+                {word.split("").map((char, charIndex) => {
+                  const inputChar = inputChars[charIndex];
+                  const isCorrect = inputChar === char;
+                  return (
+                    <Text key={charIndex} color={isCorrect ? "green" : "red"}>
+                      {char}
+                    </Text>
+                  );
+                })}
+                {inputChars.length > word.length &&
+                  inputChars
+                    .slice(word.length)
+                    .map((char, i) => (
+                      <Text key={`extra-${i}`} color="red" strikethrough>
+                        {char}
+                      </Text>
+                    ))}
               </Box>
             );
           }
