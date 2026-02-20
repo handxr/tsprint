@@ -6,10 +6,13 @@ const DURATIONS: Duration[] = [15, 30, 60];
 
 type MenuProps = {
   onStart: (duration: Duration) => void;
+  defaultDuration: Duration;
 };
 
-export function Menu({ onStart }: MenuProps) {
-  const [selectedIndex, setSelectedIndex] = useState(1);
+export function Menu({ onStart, defaultDuration }: MenuProps) {
+  const [selectedIndex, setSelectedIndex] = useState(
+    DURATIONS.indexOf(defaultDuration)
+  );
 
   useInput((input, key) => {
     if (key.leftArrow) {
@@ -26,6 +29,7 @@ export function Menu({ onStart }: MenuProps) {
       <Text bold color="yellow">
         typesprint
       </Text>
+
       <Box marginTop={2} gap={2}>
         {DURATIONS.map((d, i) => (
           <Text
@@ -38,8 +42,22 @@ export function Menu({ onStart }: MenuProps) {
           </Text>
         ))}
       </Box>
+
       <Box marginTop={1}>
         <Text dimColor>← / → to choose, Enter to start</Text>
+      </Box>
+
+      <Box flexDirection="column" marginTop={2} gap={0}>
+        <Text dimColor>─── keys ───</Text>
+        <Text dimColor>
+          <Text color="gray">Tab</Text>    restart game
+        </Text>
+        <Text dimColor>
+          <Text color="gray">Esc</Text>    back to menu
+        </Text>
+        <Text dimColor>
+          <Text color="gray">Ctrl+C</Text> quit
+        </Text>
       </Box>
     </Box>
   );
